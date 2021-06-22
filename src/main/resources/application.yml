@@ -1,0 +1,20 @@
+spring:
+    #集成mysql数据库的配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://1.117.138.180:3306/boke?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: Lsh0611.
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false
+  freemarker:
+    charset: UTF-8
+    # 开发阶段设置为false因为经常会被改
+    cache: false
+    # 默认为ftl
+    suffix: .ftl
+    # 存放模板的文件夹，以resources文件夹为相对路径
+    template-loader-path: classpath:/templates/
