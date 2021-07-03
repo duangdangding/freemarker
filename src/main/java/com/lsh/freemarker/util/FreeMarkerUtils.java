@@ -1,6 +1,5 @@
 package com.lsh.freemarker.util;
 
-import cn.hutool.core.util.StrUtil;
 import com.lsh.freemarker.entry.TableVo;
 import com.lsh.freemarker.entry.Tables;
 import com.lsh.freemarker.entry.TableInfo;
@@ -12,6 +11,7 @@ import freemarker.template.TemplateModelException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
@@ -56,8 +56,7 @@ public class FreeMarkerUtils {
      * 首字母大写
      */
     public  String capFirst(String str){
-//        return str.substring(0,1).toUpperCase()+str.substring(1).toLowerCase();
-        return StringUtils.capitalize(str);
+        return str.substring(0,1).toUpperCase()+str.substring(1).toLowerCase();
     }
 
     /**
@@ -70,9 +69,8 @@ public class FreeMarkerUtils {
             if(result.length()==0){
                 result.append(s);
             }else{
-//                result.append(s.substring(0, 1).toUpperCase());
-//                result.append(s.substring(1).toLowerCase());
-                result.append(capFirst(s));
+                result.append(s.substring(0, 1).toUpperCase());
+                result.append(s.substring(1).toLowerCase());
             }
         }
         return result.toString();
@@ -82,7 +80,7 @@ public class FreeMarkerUtils {
      * 获取类名
      */
     public String getEntityName(String tableName){
-        return capFirst(getEntityNameLower(tableName));
+        return underlineToHump(capFirst(tableName.toLowerCase()));
     }
 
     /**
@@ -195,11 +193,8 @@ public class FreeMarkerUtils {
             String javaType = convertToJava(tmp_type);
             vo.setAttributeType(javaType);
             vo.setAttribute(underlineToHump(field));
-            String comment = info.get("Comment").toString();
-            if (StrUtil.isEmpty(comment)) {
-                comment = field;
-            }
-            vo.setDescription(comment);
+            Object comment = info.get("Comment");
+            vo.setDescription(comment.toString() + "~" + field);
             vos.add(vo);
         });
         return vos;
@@ -237,8 +232,10 @@ public class FreeMarkerUtils {
         List<Tables> tables = new ArrayList<>();
         maps.forEach(map -> {
             Tables table = new Tables();
-            table.setTable_name(map.get("table_name").toString());
-            table.setTable_comment(map.get("table_comment").toString());
+            String tableName = map.get("TABLE_NAME").toString();
+            table.setTable_name(tableName);
+            Object comment = map.get("TABLE_COMMENT");
+            table.setTable_comment(ObjectUtils.isEmpty(comment) ? "" : comment.toString());
             tables.add(table);
         });
         return tables;
@@ -249,12 +246,9 @@ public class FreeMarkerUtils {
         Map<String, Object> map = jdbcTemplate.queryForMap(sql, database, tableName);
 
         Tables table = new Tables();
-        String table_comment = map.get("table_comment").toString();
+        Object table_comment = map.get("TABLE_COMMENT");
         table.setTable_name(tableName);
-        if (StrUtil.isEmpty(table_comment)) {
-            table_comment = tableName;
-        }
-        table.setTable_comment(table_comment);
+        table.setTable_comment(ObjectUtils.isEmpty(table_comment) ? "" : table_comment.toString());
         return table;
     }
     
@@ -267,10 +261,22 @@ public class FreeMarkerUtils {
     /**
      * 生成代码
      */
-    public void generate(Map<String, Object> root,String templateName,String saveUrl,String entityName) throws Exception {
+    public void generate_bak(Map<String, Object> root,String templateName,String saveUrl,String entityName) throws Exception {
         //获取模板
         Template template = freeMarker.getTemplate(templateName);
         //输出文件
         printFile(root, template, saveUrl, entityName);
+    }
+    public void generate(Map<String, Object> root,String templateName,String path) throws Exception {
+        //获取模板
+        Template template = freeMarker.getTemplate(templateName);
+        //输出文件
+        createFile(root, template, path);
+    }
+
+    public void createFile(Map<String, Object> root, Template template,String path) throws Exception  {
+        Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(path)), StandardCharsets.UTF_8));
+        template.process(root,  out);
+        out.close();
     }
 }

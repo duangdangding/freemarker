@@ -35,7 +35,7 @@ class FreemarkerApplicationTests {
     void createOne() {
         Map<String,Object> all = new HashMap<>();
         initParam(all);
-        Tables table = freeMarkerUtils.getTable("boke", "user_custom");
+        Tables table = freeMarkerUtils.getTable("boke", "parse_urls");
         oneTable(table,all);
     }
 
@@ -51,14 +51,19 @@ class FreemarkerApplicationTests {
             oneTable(table,all);
         }
     }
-    
+
+    /**
+     * 初始化数据
+     * @param all
+     */
     public void initParam(Map<String,Object> all) {
         FtlEntry ftlEntry = new FtlEntry();
-        ftlEntry.setEntryPath("com.lsh.myboke.entry");
-        ftlEntry.setMapperPath("com.lsh.myboke.mapper");
-        ftlEntry.setServicePath("com.lsh.myboke.service");
-        ftlEntry.setServiceImplPath("com.lsh.myboke.service.impl");
-        ftlEntry.setControllerPath("com.lsh.myboke.ctr");
+        String rootPackage = "com.lll.boke.";
+        ftlEntry.setEntryPath(rootPackage + "entry");
+        ftlEntry.setMapperPath(rootPackage + "mapper");
+        ftlEntry.setServicePath(rootPackage + "service");
+        ftlEntry.setServiceImplPath(rootPackage + "service.impl");
+        ftlEntry.setControllerPath(rootPackage + "ctr");
 //        这里可以修改
         ftlEntry.setAuthor("lushao");
         all.put("jsonParam",ftlEntry);
@@ -74,9 +79,12 @@ class FreemarkerApplicationTests {
      */
     public void oneTable(Tables table,Map<String,Object> all) {
         TableInfo info = new TableInfo();
+//        表名
         String tableName = table.getTable_name();
+//        类名
         String className = freeMarkerUtils.getEntityName(tableName);
         info.setTableName(tableName);
+//        表的注释
         info.setDescription(table.getTable_comment());
         info.setClassName(className);
         List<TableVo> tableInfo = freeMarkerUtils.getDataInfo(tableName);
@@ -84,11 +92,11 @@ class FreemarkerApplicationTests {
         info.setDescription(table.getTable_comment());
         all.put("tableInfo", info);
         try {
-            freeMarkerUtils.generate(all,"entry.ftl","freemark/entry/",  className + ".java");
-            freeMarkerUtils.generate(all,"mapper.ftl","freemark/mapper/",  className + "Mapper.java");
-            freeMarkerUtils.generate(all,"service.ftl","freemark/service/",  className + "Service.java");
-            freeMarkerUtils.generate(all,"serviceimpl.ftl","freemark/serviceimpl/",  className + "ServiceImpl.java");
-            freeMarkerUtils.generate(all,"controller.ftl","freemark/controller/",  className + "Ctr.java");
+            freeMarkerUtils.generate_bak(all,"entry.ftl","freemark/entry/",  className + ".java");
+            freeMarkerUtils.generate_bak(all,"mapper.ftl","freemark/mapper/",  className + "Mapper.java");
+            freeMarkerUtils.generate_bak(all,"service.ftl","freemark/service/",  className + "Service.java");
+            freeMarkerUtils.generate_bak(all,"serviceimpl.ftl","freemark/serviceimpl/",  className + "ServiceImpl.java");
+            freeMarkerUtils.generate_bak(all,"controller.ftl","freemark/controller/",  className + "Ctr.java");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -106,11 +114,4 @@ class FreemarkerApplicationTests {
     }
     
 
-    @Test
-    void test() {
-        String str = "['icon-caomei','icon-boluo','icon-huolongguo','icon-chengzi','icon-hamigua','icon-lizhi','icon-mangguo','icon-liulian','icon-lizi','icon-lanmei','icon-longyan','icon-shanzhu','icon-pingguo','icon-mihoutao','icon-niuyouguo','icon-xigua','icon-putao','icon-xiangjiao','icon-ningmeng','icon-yingtao','icon-taozi','icon-shiliu','icon-ximei','icon-shizi']";
-        String s = str.replace("[","").replace("'","").replace("]","");
-        System.out.println(s);
-    }
-    
 }

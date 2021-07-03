@@ -7,9 +7,6 @@ import freemarker.template.TemplateModelException;
 
 import java.util.List;
 
-/**
- * ftl模板中引入java类或者方法
- */
 public class FtlUtils {
 
     private final static BeansWrapper wrapper = BeansWrapper.getDefaultInstance();

@@ -4,6 +4,7 @@ package ${jsonParam.entryPath};
 <#if FtlUtils.fieldTypeExisted(tableInfo.fieldInfos, "Date")>
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.baomidou.mybatisplus.annotation.TableId;    
 </#if>
 <#if FtlUtils.fieldTypeExisted(tableInfo.fieldInfos, "BigDecimal")>
 import java.math.BigDecimal;
@@ -33,10 +34,13 @@ public class ${tableInfo.className} {
     <#--<#if paramConfig.fileUpdateMode == 0 || paramConfig.fileUpdateMode == 1>
 
         /* ${String.format(paramConfig.mergeFileMarkBegin, 1)} */
-    </#if>-->
+</#if>-->
     <#list tableInfo.fieldInfos as fieldInfo>
         <#if fieldInfo.primary>
     @TableId
+        </#if>
+        <#if !fieldInfo.primary>
+    @TableField("${fieldInfo.column}")
         </#if>
     @ApiModelProperty(value = "${fieldInfo.description}")
         <#if fieldInfo.attributeType == "Date">
